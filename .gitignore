@@ -1,0 +1,9 @@
+Makefile
+README.html
+__pycache__
+assets
+build
+dist
+linktetrado.egg-info
+src/linktetrado.egg-info
+test
