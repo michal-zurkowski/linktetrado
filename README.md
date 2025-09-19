@@ -9,6 +9,24 @@ It leverages the ElTetrado engine to extract detailed structural information abo
 base pairs and tetrads in an input structure. Next, it searches the space in the vicinity
 of tetrads for possible nucleotides that could interact with the tetrads.
 
+# Polyadic motifs
+
+Polyadic motifs - such as triads (3 bases), tetrads (4), pentads (5), hexads (6), 
+heptads (7), and octads (8)—are formed when three or more nucleotides interact through
+hydrogen bonding, typically through their Hoogsteen or sugar edges, resulting in stable, 
+ring-like networks where each base generally forms bonds with two adjacent bases. 
+These polyadic motifs play a crucial role in enhancing the stability and structural 
+complexity of nucleic acids and are involved in essential processes, including gene 
+regulation and molecular recognition. The figure below illustrates schematic 
+representations of example polyadic motifs in a cut, top down 3D visualization 
+and a simple 2D graph.
+![Polyad Example](https://github.com/michal-zurkowski/linktetrado/blob/main/polyad-examples.png?raw=true)
+Example polyadic motifs of different orders and their schematic representations:
+(A) pentad (5 nucleotides), (B) hexad (6 nucleotides), (C) heptad (7 nucleotides), and
+(D) octad (8 nucleotides). In the 3D models (top row), nucleotides forming the polyads
+are shown in color, coded by nucleotide type: green for guanine, blue for uracil or
+thymine, and red for adenine. Green thus highlights the guanine tetrad core.
+
 # Installation
 
 Please download repository and run:
