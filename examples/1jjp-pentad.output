@@ -1,0 +1,29 @@
+Chain order: A B
+n4-helix with 4 tetrads
+  Mh* V,VII n/a quadruplex with 4 tetrads
+    A.DG3 A.DG6 A.DG10 A.DG12 cWH cWH cWH cWH O+ Va planarity=0.11  
+      direction=hybrid rise=3.09 twist=35.49
+    A.DG2 A.DG5 B.DG1 A.DG11 cWH cWH cWH cWH N+ Va planarity=0.22  
+      direction=hybrid rise=3.06 twist=22.3
+    A.DG1 B.DG5 B.DG2 B.DG11 cHW cHW cHW cHW Z- VIIb planarity=0.22  
+      direction=parallel rise=3.09 twist=34.84
+    B.DG10 B.DG6 B.DG3 B.DG12 cHW cHW cHW cHW O+ Va planarity=0.11  
+
+    Tracts:
+      A.DG3, A.DG2, A.DG1, B.DG10
+      A.DG6, A.DG5, B.DG5, B.DG6
+      A.DG10, B.DG1, B.DG2, B.DG3
+      A.DG12, A.DG11, B.DG11, B.DG12
+
+    Loops:
+      propeller- A.DA4
+      lateral- A.DT7, A.DT8, A.DT9
+      propeller- B.DA4
+      lateral- B.DT7, B.DT8, B.DT9
+
+GGGAGGTTTGGGAT-GGGAGGTTTGGGAT
+(([.)]...([)..-][{.)(...)]}..
+([{.((...)]}..-)([.)]...[)]..
+
+    [A.DG1, B.DG5, B.DA4, B.DG2, B.DG11] - Pentad
+    [A.DG2, A.DA4, A.DG5, B.DG1, A.DG11] - Pentad

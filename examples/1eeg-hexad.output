@@ -1,0 +1,38 @@
+Chain order: A B C D
+n4-helix with 4 tetrads
+  Op+ VIII n/a quadruplex with 2 tetrads
+    A.DG2 A.DG5 B.DG2 B.DG5 cWH cWH cWH cWH O+ VIIIa planarity=0.43  
+      direction=parallel rise=3.29 twist=28.6
+    A.DG1 A.DG4 B.DG1 B.DG4 cWH cWH cWH cWH O+ VIIIa planarity=0.41  
+
+    Tracts:
+      A.DG2, A.DG1
+      A.DG5, A.DG4
+      B.DG2, B.DG1
+      B.DG5, B.DG4
+
+    Loops:
+      propeller- A.DA3
+      propeller- B.DA3
+
+  Op+ VIII n/a quadruplex with 2 tetrads
+    D.DG4 D.DG1 C.DG4 C.DG1 cHW cHW cHW cHW O+ VIIIa planarity=0.21  
+      direction=parallel rise=3.14 twist=29.12
+    D.DG5 D.DG2 C.DG5 C.DG2 cHW cHW cHW cHW O+ VIIIa planarity=0.53  
+
+    Tracts:
+      D.DG4, D.DG5
+      D.DG1, D.DG2
+      C.DG4, C.DG5
+      C.DG1, C.DG2
+
+    Loops:
+      propeller- C.DA3
+      propeller- D.DA3
+
+GGAGGA-GGAGGA-GGAGGA-GGAGGA
+([.)].-([.)].-([.)].-([.)].
+([.([.-)].)].-([.([.-)].)].
+
+    [A.DG1, A.DA3, A.DG4, B.DG1, B.DA3, B.DG4] - Hexad
+    [D.DG4, D.DA3, D.DG1, C.DG4, C.DA3, C.DG1] - Hexad
