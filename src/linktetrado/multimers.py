@@ -9,36 +9,6 @@ from rnapolis.common import BasePair, Residue, Stacking
 from eltetrado.analysis import Tetrad, has_tetrad, center_of_mass
 from functools import cmp_to_key
 
-'''
-def center_of_mass(atoms: List[Atom]) -> numpy.typing.NDArray[numpy.floating]:
-    coords = [atom.coordinates for atom in atoms]
-    xs = (coord[0] for coord in coords)
-    ys = (coord[1] for coord in coords)
-    zs = (coord[2] for coord in coords)
-    return numpy.array(
-        (sum(xs) / len(coords), sum(ys) / len(coords), sum(zs) / len(coords))
-    )
-
-def oai_atoms(residue) -> numpy.typing.NDArray[numpy.floating]:
-    return center_of_mass([residue.outermost_atom, residue.innermost_atom])
-
-
-def nucleobase_atoms(residue) -> numpy.typing.NDArray[numpy.floating]:
-    atoms = []
-    upper = residue.one_letter_name.upper()
-    if upper == "T":
-        upper = "U"
-    if upper in residue.nucleobase_heavy_atoms:
-        base_atoms = residue.nucleobase_heavy_atoms[upper]
-        for base_atom in base_atoms:
-            atom = residue.find_atom(base_atom)
-            if atom is not None:
-                atoms.append(atom)
-        return center_of_mass(atoms)
-    else:
-        return residue.outermost_atom.coordinates
-'''
-
 def in_tetrad(nt, tetrad):
     for nucl in tetrad.nucleotides:
         if nucl == nt:
@@ -124,10 +94,10 @@ class Candidate:
     tilts_true: List[float] = field(default_factory=list)
 
     # Stage 3 - Distance
-    DISTANCE_A_THRESHOLD_INN = 14.00
+    DISTANCE_A_THRESHOLD_INN = 13.75
     DISTANCE_A_THRESHOLD_INN_CLOSE = 12.50
     DISTANCE_A_THRESHOLD_OUT = 12.50
-    DISTANCE_A_THRESHOLD_OUT_CLOSE = 10.00
+    DISTANCE_A_THRESHOLD_OUT_CLOSE = 11.00
     # Distance of candidate to center of tetrad
     dist_outer: float = field(default_factory=list)
     dist_inner: float = field(default_factory=list)
@@ -139,11 +109,21 @@ class Candidate:
     tetrad_dists_outer: List[float] = field(default_factory=list)
 
     # Stage 4 - Level plane height
-    HEIGHT_DIFF_THRESHOLD = 3.6
+    HEIGHT_DIFF_THRESHOLD = 3.7
+    HEIGHT_DIFF_THRESHOLD_AVG = 3.15
     #HEIGHT_DIFF_THRESHOLD_CENTRAL = 3.0
     height_inner: List[float] = field(default_factory=list)
     height_outer: List[float] = field(default_factory=list)
 
+    def set_params(self, params):
+        self.TILT_DEGREE_THRESHOLD_MAX = params.tilt_max
+        self.TILT_DEGREE_THRESHOLD_AVG = params.tilt_avg
+        self.DISTANCE_A_THRESHOLD_INN = params.distance_inner_max
+        self.DISTANCE_A_THRESHOLD_INN_CLOSE = params.distance_inner_max - 1.25
+        self.DISTANCE_A_THRESHOLD_OUT = params.distance_outer_max
+        self.DISTANCE_A_THRESHOLD_OUT_CLOSE = params.distance_outer_max - 1.50
+        self.HEIGHT_DIFF_THRESHOLD = params.height_diff_max
+        self.HEIGHT_DIFF_THRESHOLD_AVG = params.height_diff_avg
 
     def __post_init__(self):
         # Stage 2
@@ -186,6 +166,16 @@ class Candidate:
 
     def location(self):
         # Between nt1 & nt2
+        if max(self.dists_inner[0], self.dists_inner[1]) < min(self.dists_inner[2], self.dists_inner[3]):
+            return 1
+        if max(self.dists_inner[1], self.dists_inner[2]) < min(self.dists_inner[3], self.dists_inner[0]):
+            return 2
+        if max(self.dists_inner[2], self.dists_inner[3]) < min(self.dists_inner[0], self.dists_inner[1]):
+            return -1
+        if max(self.dists_inner[3], self.dists_inner[0]) < min(self.dists_inner[1], self.dists_inner[2]):
+            return -2
+
+
         if is_between(self.tetrad.global_index[self.resi],
                 self.tetrad.global_index[self.tetrad.nt1],
                 self.tetrad.global_index[self.tetrad.nt2]):
@@ -226,39 +216,32 @@ class Candidate:
                     / self.TILT_DEGREE_THRESHOLD_AVG)
                     * 100.,
                     2.0)
-        #print("1", score)
         score += 0.5 * \
                 math.pow(((self.TILT_DEGREE_THRESHOLD_MAX - math.fabs(self.tilt_max))
                     / self.TILT_DEGREE_THRESHOLD_MAX)
                     * 100.,
                     2.0)
-        #print("2", score)
         score += 1.00 * \
                 math.pow(((self.HEIGHT_DIFF_THRESHOLD - (sum(self.height_inner) / len(self.height_inner)))
                     / self.HEIGHT_DIFF_THRESHOLD)
                     * 100.,
                     1.75)
-        #print("3", score)
         score += 0.75 * \
                 math.pow(((self.HEIGHT_DIFF_THRESHOLD - max(self.height_inner, key=abs))
                     /  self.HEIGHT_DIFF_THRESHOLD)
                     * 100.,
                     1.75)
-        #print("4", score)
         score += 1.00 * \
                 math.pow(((self.HEIGHT_DIFF_THRESHOLD - (sum(self.height_outer) / len(self.height_outer)))
                     / self.HEIGHT_DIFF_THRESHOLD)
                     * 100.,
                     1.75)
-        #print("5", score)
         score += 0.75 * \
                 math.pow(((self.HEIGHT_DIFF_THRESHOLD - max(self.height_outer, key=abs))
                     /  self.HEIGHT_DIFF_THRESHOLD)
                     * 100.,
                     1.75)
-        #print("6", score)
         score /= self.connection.score()
-        #print("7", score)
 
         return score
 
@@ -277,6 +260,7 @@ class Candidate:
             return False
         if self.dist_outer >= self.DISTANCE_A_THRESHOLD_OUT:
             return False
+
         # Candidate cannot be same distance away as current tetrad nucleotides
         for dist in self.tetrad_dists_inner:
             if self.dist_inner <= dist + 1.75:
@@ -286,25 +270,49 @@ class Candidate:
                 return False
         # Check if candidate is close to 2 nucleotides
         close_inn = 0
+        test = []
         for dist in self.dists_inner:
+            test.append(dist)
             if dist < self.DISTANCE_A_THRESHOLD_INN_CLOSE:
                 close_inn += 1
+        test.sort()
+        bad_in = 0
+        if test[1] - test[0] > 1.25:
+            bad_in = 1
         if close_inn < 2:
             return False
         close_out = 0
+        test2 = []
         for dist in self.dists_outer:
+            test2.append(dist)
             if dist < self.DISTANCE_A_THRESHOLD_OUT_CLOSE:
                 close_out += 1
+        test2.sort()
+        bad_out = 0
+        if test2[1] - test2[0] > 1.25:
+            bad_out = 1
         if close_out < 2:
+            return False
+        if bad_out == 1 and bad_in == 1:
             return False
 
         # Stage 4 - Height Level
+        avg = 0
         for height in self.height_inner:
+            avg += height
             if math.fabs(height) >= self.HEIGHT_DIFF_THRESHOLD:
                 return False
+        avg /= len(self.height_inner)
+        if math.fabs(avg) >= self.HEIGHT_DIFF_THRESHOLD_AVG:
+            return False
+        avg = 0
         for height in self.height_outer:
+            avg += height
             if math.fabs(height) >= self.HEIGHT_DIFF_THRESHOLD:
                 return False
+        avg /= len(self.height_inner)
+        if math.fabs(avg) >= self.HEIGHT_DIFF_THRESHOLD_AVG:
+            return False
 
         # Everything passed
         return True
@@ -399,7 +407,7 @@ class Multimer:
             f"- {self.multimer_class.value}"
         )
 
-def ntads(analysis):
+def ntads(analysis, params):
     # Stage 0
     # Filter out all residues that already are a part of any tetrad.
     filtered_residues = filter_out_tetrad_residues(analysis)
@@ -409,7 +417,11 @@ def ntads(analysis):
     # a) BasePair connection
     # b) Sequence continuity
     tetrad_candidates = connected2tetrad(filtered_residues, analysis)
-    #print(tetrad_candidates)
+
+    # Change all candidates to have potentailly custom params
+    for tetrad, candidates in tetrad_candidates.items():
+        for candidate in candidates:
+            candidate.set_params(params)
 
     # In practice connected_tetrad_candidates already have all needed parameters calculated here
     # and we need to remove all unneeded / not valid candidates with incorrect:
@@ -472,6 +484,7 @@ def ntads(analysis):
                 to_remove.append(candidate)
         for rm in to_remove:
             left_candidates.remove(rm)
+
         # First addition - anchor.
         # Dictates next addition to the multimer as it has to be on the opposite side.
         if (len(left_candidates) >= 1):
@@ -492,6 +505,7 @@ def ntads(analysis):
             for rm in to_remove:
                 left_candidates.remove(rm)
 
+
         if (len(left_candidates) >= 1):
             # Now take best, with heptad the next one can be on either side but NOT in the same
             # location as current picks
@@ -503,10 +517,10 @@ def ntads(analysis):
                     to_remove.append(candidate)
             for rm in to_remove:
                 left_candidates.remove(rm)
-
+ 
         # Now try to add to octad
         if (len(left_candidates) >= 1):
-            # Hexad
+            # Octad
             # Find best for the next oposite location.
             for candidate in left_candidates:
                 if add_order[-1].location() != candidate.location() and \
@@ -520,56 +534,51 @@ def ntads(analysis):
             for candidate in left_candidates:
                 if math.fabs(add_order[-1].location()) == math.fabs(candidate.location()):
                     to_remove.append(candidate)
-            for rm in to_remove:
-                left_candidates.remove(rm)
-
-            for candidate in left_candidates:
-                if add_order[-1].location() != candidate.location() and \
-                   add_order[-1].location() + candidate.location() == 0:
-                       add_order.append(candidate)
-                       left_candidates.remove(candidate)
-                       break
-
 
         # Clean unwanted heptads
         # Heptads are more unstable and the move from 6 -> 7 should be as stable as possible.
         # Check if score difference of hexad and added heptead candidate is not too much.
         # Do not check if we have made an octad.
         if len(add_order) == 3:
-            if add_order[0].score() + add_order[1].score() < add_order[2].score():
+            if max(add_order[0].score(), add_order[1].score()) < add_order[2].score():
                 add_order.remove(add_order[2])
-
+        #for add in add_order:
+        #    print(add.score())
         valid_tetrad_candidates[tetrad] = add_order
 
     # Now we have made multimers from available candidates.
     # Step 2 - Shrink down all multimers to match numbers and positions.
     # They should fill similar positions for each multimer and have same number of nucleotides.
-    # Match to the lowest possible.
-    desired_len = 999
-    desired_positions = []
-    for tetrad, candidates in valid_tetrad_candidates.items():
-        if len(candidates) < desired_len and len(candidates) > 0:
-            desired_len = len(candidates)
-            desired_positions = []
-            for candidate in candidates:
-                desired_positions.append(candidate.location())
-
+    # Match to the lowest possible or hughest number of same type.
+    desired_lens = []
     for tetrad, candidates in valid_tetrad_candidates.items():
         if len(candidates) > 0:
-            to_remove = []
-            for candidate in candidates:
-                if candidate.location() not in desired_positions:
-                    to_remove.append(candidate)
-            for rm in to_remove:
-                candidates.remove(rm)
+            desired_lens.append(len(candidates))
+    desired_lens.sort()
 
     multimers = []
-    for tetrad, candidates in valid_tetrad_candidates.items():
-        if len(candidates) > 0:
-            multimers.append(Multimer(tetrad, candidates))
+    if (len(desired_lens) > 0):
+        max_ct, desired_len, curr_ct = 1, desired_lens[0], 1
+        for i in range(1, len(desired_lens)):
+            if desired_lens[i] == desired_lens[i - 1]:
+                curr_ct += 1
+            else:
+                curr_ct = 1
+            if curr_ct > max_ct:
+                max_ct = curr_ct
+                desired_len = desired_lens[i]
+
+
+        for tetrad, candidates in valid_tetrad_candidates.items():
+            if len(candidates) > 0 and len(candidates) == desired_len:
+                multimers.append(Multimer(tetrad, candidates))
+            elif len(candidates) > 0 and len(candidates) > desired_len:
+                to_remove = len(candidates) - desired_len
+                candidates = candidates[:to_remove]
+                multimers.append(Multimer(tetrad, candidates))
 
     return multimers
 
 
-def linktetrado(analysis):
-    return ntads(analysis)
+def linktetrado(analysis, params):
+    return ntads(analysis, params)
