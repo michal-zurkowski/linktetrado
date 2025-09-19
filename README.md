@@ -12,7 +12,7 @@ of tetrads for possible nucleotides that could interact with the tetrads.
 # Polyadic motifs
 
 Polyadic motifs - such as triads (3 bases), tetrads (4), pentads (5), hexads (6), 
-heptads (7), and octads (8)—are formed when three or more nucleotides interact through
+heptads (7), and octads (8) - are formed when three or more nucleotides interact through
 hydrogen bonding, typically through their Hoogsteen or sugar edges, resulting in stable, 
 ring-like networks where each base generally forms bonds with two adjacent bases. 
 These polyadic motifs play a crucial role in enhancing the stability and structural 
@@ -20,6 +20,8 @@ complexity of nucleic acids and are involved in essential processes, including g
 regulation and molecular recognition. The figure below illustrates schematic 
 representations of example polyadic motifs in a cut, top down 3D visualization 
 and a simple 2D graph.
+
+
 ![Polyad Example](https://github.com/michal-zurkowski/linktetrado/blob/main/polyad-examples.png?raw=true)
 Example polyadic motifs of different orders and their schematic representations:
 (A) pentad (5 nucleotides), (B) hexad (6 nucleotides), (C) heptad (7 nucleotides), and
@@ -106,11 +108,12 @@ PDBx/mmCIF files which will be first analyzed internally with ElTetrado.
                             be misclassified; use with care!
 
 
-<!-- TODO
 
 # Examples
 
--->
+The repository contains 4 example structures that contain pentad, hexad, heptad and octad
+motifs as well as the expected default output from the program that is expected for each of them.
+The examples include structures 1JJP (pentad), 1EEG (hexad), 1oz8 (heptad), 1n7a (octad). 
 
 # Bibliography
 
