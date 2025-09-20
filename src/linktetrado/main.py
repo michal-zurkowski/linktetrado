@@ -37,28 +37,37 @@ def main():
     parser.add_argument('--tilt-max',
                         help='(optional) maximum tilt in degrees between potential polyad candidate nucleotide and all tetrad nucleotides [default=55]',
                         default=55,
-                        type=float)
+                        type=float,
+                        metavar='TT_MAX')
     parser.add_argument('--tilt-avg',
                         help='(optional) average tilt in degrees between potential polyad candidate nucleotide and all tetrad nucleotides [default=45]',
                         default=45,
-                        type=float)
-    parser.add_argument('--height-diff-max',
+                        type=float,
+                        metavar='TT_AVG')
+    parser.add_argument('--height-max',
                         help='(optional) maximum height difference in Angstrem between between potential polyad candidate nucleotide and all tetrad nucleotides [default=3.7]',
                         default=3.7,
-                        type=float)
-    parser.add_argument('--height-diff-avg',
+                        type=float,
+                        metavar='HT_MAX')
+    parser.add_argument('--height-avg',
                         help='(optional) average height difference in Angstrem between between potential polyad candidate nucleotide and all tetrad nucleotides [default=3.15]',
                         default=3.15,
-                        type=float)
-
-    parser.add_argument('--distance-inner-max',
+                        type=float,
+                        metavar='HT_AVG')
+    parser.add_argument('--dist-in-max',
                         help='(optional) maximum distance in Angstrem between inner atoms between potential polyad candidate nucleotide and all tetrad nucleotides [default=13.75]',
                         default=13.75,
-                        type=float)
-    parser.add_argument('--distance-outer-max',
+                        type=float,
+                        metavar='DT_INMAX')
+    parser.add_argument('--dist-out-max',
                         help='(optional) maximum distance in Angstrem between outer atoms between potential polyad candidate nucleotide and all tetrad nucleotides [default=12.5]',
                         default=12.5,
-                        type=float)
+                        type=float,
+                        metavar='DT_OUTMAX')
+    parser.add_argument('--lax-order',
+                        help='(optional) adjusts the algorithm’s filtering mode, enabling the detection of polyads with varying orders within a single stack',
+                        action="store_true")
+
 
     # ElTetrado options.
     parser.add_argument('-m', '--model', help='(optional, ElTetrado) model number to process', default=1, type=int)

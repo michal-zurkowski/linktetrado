@@ -118,12 +118,12 @@ class Candidate:
     def set_params(self, params):
         self.TILT_DEGREE_THRESHOLD_MAX = params.tilt_max
         self.TILT_DEGREE_THRESHOLD_AVG = params.tilt_avg
-        self.DISTANCE_A_THRESHOLD_INN = params.distance_inner_max
-        self.DISTANCE_A_THRESHOLD_INN_CLOSE = params.distance_inner_max - 1.25
-        self.DISTANCE_A_THRESHOLD_OUT = params.distance_outer_max
-        self.DISTANCE_A_THRESHOLD_OUT_CLOSE = params.distance_outer_max - 1.50
-        self.HEIGHT_DIFF_THRESHOLD = params.height_diff_max
-        self.HEIGHT_DIFF_THRESHOLD_AVG = params.height_diff_avg
+        self.DISTANCE_A_THRESHOLD_INN = params.dist_in_max
+        self.DISTANCE_A_THRESHOLD_INN_CLOSE = params.dist_in_max - 1.25
+        self.DISTANCE_A_THRESHOLD_OUT = params.dist_out_max
+        self.DISTANCE_A_THRESHOLD_OUT_CLOSE = params.dist_out_max - 1.50
+        self.HEIGHT_DIFF_THRESHOLD = params.height_max
+        self.HEIGHT_DIFF_THRESHOLD_AVG = params.height_avg
 
     def __post_init__(self):
         # Stage 2
@@ -517,7 +517,7 @@ def ntads(analysis, params):
                     to_remove.append(candidate)
             for rm in to_remove:
                 left_candidates.remove(rm)
- 
+
         # Now try to add to octad
         if (len(left_candidates) >= 1):
             # Octad
@@ -546,35 +546,41 @@ def ntads(analysis, params):
         #    print(add.score())
         valid_tetrad_candidates[tetrad] = add_order
 
-    # Now we have made multimers from available candidates.
-    # Step 2 - Shrink down all multimers to match numbers and positions.
-    # They should fill similar positions for each multimer and have same number of nucleotides.
-    # Match to the lowest possible or hughest number of same type.
-    desired_lens = []
-    for tetrad, candidates in valid_tetrad_candidates.items():
-        if len(candidates) > 0:
-            desired_lens.append(len(candidates))
-    desired_lens.sort()
-
     multimers = []
-    if (len(desired_lens) > 0):
-        max_ct, desired_len, curr_ct = 1, desired_lens[0], 1
-        for i in range(1, len(desired_lens)):
-            if desired_lens[i] == desired_lens[i - 1]:
-                curr_ct += 1
-            else:
-                curr_ct = 1
-            if curr_ct > max_ct:
-                max_ct = curr_ct
-                desired_len = desired_lens[i]
-
-
+    print(params.lax_order)
+    if not params.lax_order:
+        # Now we have made multimers from available candidates.
+        # Step 2 - Shrink down all multimers to match numbers and positions.
+        # They should fill similar positions for each multimer and have same number of nucleotides.
+        # Match to the lowest possible or hughest number of same type.
+        desired_lens = []
         for tetrad, candidates in valid_tetrad_candidates.items():
-            if len(candidates) > 0 and len(candidates) == desired_len:
-                multimers.append(Multimer(tetrad, candidates))
-            elif len(candidates) > 0 and len(candidates) > desired_len:
-                to_remove = len(candidates) - desired_len
-                candidates = candidates[:to_remove]
+            if len(candidates) > 0:
+                desired_lens.append(len(candidates))
+        desired_lens.sort()
+
+        if (len(desired_lens) > 0):
+            max_ct, desired_len, curr_ct = 1, desired_lens[0], 1
+            for i in range(1, len(desired_lens)):
+                if desired_lens[i] == desired_lens[i - 1]:
+                    curr_ct += 1
+                else:
+                    curr_ct = 1
+                if curr_ct > max_ct:
+                    max_ct = curr_ct
+                    desired_len = desired_lens[i]
+
+
+            for tetrad, candidates in valid_tetrad_candidates.items():
+                if len(candidates) > 0 and len(candidates) == desired_len:
+                    multimers.append(Multimer(tetrad, candidates))
+                elif len(candidates) > 0 and len(candidates) > desired_len:
+                    to_remove = len(candidates) - desired_len
+                    candidates = candidates[:to_remove]
+                    multimers.append(Multimer(tetrad, candidates))
+    else:
+        for tetrad, candidates in valid_tetrad_candidates.items():
+            if len(candidates) > 0:
                 multimers.append(Multimer(tetrad, candidates))
 
     return multimers

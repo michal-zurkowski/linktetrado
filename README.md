@@ -56,11 +56,11 @@ PDBx/mmCIF files which will be first analyzed internally with ElTetrado.
 
 # Usage
 
-    usage: linktetrado [-h] [-i INPUT] [--print-eltetrado] [--tilt-max TILT_MAX]
-                       [--tilt-avg TILT_AVG] [--height-diff-max HEIGHT_DIFF_MAX]
-                       [--height-diff-avg HEIGHT_DIFF_AVG]
-                       [--distance-inner-max DISTANCE_INNER_MAX]
-                       [--distance-outer-max DISTANCE_OUTER_MAX] [-m MODEL]
+    usage: linktetrado [-h] [-i INPUT] [--print-eltetrado]
+                       [--tilt-max TT_MAX] [--tilt-avg TT_AVG]
+                       [--height-max HT_MAX] [--height-avg HT_AVG]
+                       [--dist-in-max DT_INMAX] [--dist-out-max DT_OUTMAX]
+                       [--lax-order] [-m MODEL]
                        [--stacking-mismatch STACKING_MISMATCH] [--strict]
                        [--no-reorder]
 
@@ -68,45 +68,51 @@ PDBx/mmCIF files which will be first analyzed internally with ElTetrado.
       -h, --help            show this help message and exit
       -i INPUT, --input INPUT
                             path to input PDB, PDBx/mmCIF file.
-      --print-eltetrado     (optional) should ElTetrado analysis output also be
-                            provided alongside multimer analysis.
-      --tilt-max TILT_MAX   (optional) maximum tilt in degrees between potential
-                            polyad candidate nucleotide and all tetrad nucleotides
-                            [default=55]
-      --tilt-avg TILT_AVG   (optional) average tilt in degrees between potential
-                            polyad candidate nucleotide and all tetrad nucleotides
-                            [default=45]
-      --height-diff-max HEIGHT_DIFF_MAX
-                            (optional) maximum height difference in Angstrem between
-                            between potential polyad candidate nucleotide and all
-                            tetrad nucleotides [default=3.7]
-      --height-diff-avg HEIGHT_DIFF_AVG
-                            (optional) average height difference in Angstrem between
-                            between potential polyad candidate nucleotide and all
-                            tetrad nucleotides [default=3.15]
-      --distance-inner-max DISTANCE_INNER_MAX
-                            (optional) maximum distance in Angstrem between inner
-                            atoms between potential polyad candidate nucleotide and
-                            all tetrad nucleotides [default=13.75]
-      --distance-outer-max DISTANCE_OUTER_MAX
-                            (optional) maximum distance in Angstrem between outer
-                            atoms between potential polyad candidate nucleotide and
-                            all tetrad nucleotides [default=12.5]
+      --print-eltetrado     (optional) should ElTetrado analysis output also
+                            be provided alongside multimer analysis.
+      --tilt-max TT_MAX     (optional) maximum tilt in degrees between
+                            potential polyad candidate nucleotide and all
+                            tetrad nucleotides [default=55]
+      --tilt-avg TT_AVG     (optional) average tilt in degrees between
+                            potential polyad candidate nucleotide and all
+                            tetrad nucleotides [default=45]
+      --height-max HT_MAX   (optional) maximum height difference in Angstrem
+                            between between potential polyad candidate
+                            nucleotide and all tetrad nucleotides
+                            [default=3.7]
+      --height-avg HT_AVG   (optional) average height difference in Angstrem
+                            between between potential polyad candidate
+                            nucleotide and all tetrad nucleotides
+                            [default=3.15]
+      --dist-in-max DT_INMAX
+                            (optional) maximum distance in Angstrem between
+                            inner atoms between potential polyad candidate
+                            nucleotide and all tetrad nucleotides
+                            [default=13.75]
+      --dist-out-max DT_OUTMAX
+                            (optional) maximum distance in Angstrem between
+                            outer atoms between potential polyad candidate
+                            nucleotide and all tetrad nucleotides
+                            [default=12.5]
+      --lax-order           (optional) adjusts the algorithm’s filtering
+                            mode, enabling the detection of polyads with
+                            varying orders within a single stack
       -m MODEL, --model MODEL
                             (optional, ElTetrado) model number to process
       --stacking-mismatch STACKING_MISMATCH
-                            a perfect tetrad stacking covers 4 nucleotides; this
-                            option can be used with value 1 or 2 to allow this
-                            number of nucleotides to be non-stacked with otherwise
-                            well aligned tetrad [default=2]
-      --strict              nucleotides in tetrad are found when linked only by cWH
-                            pairing
-      --no-reorder          chains of bi- and tetramolecular quadruplexes should be
-                            reordered to be able to have them classified; when this
-                            is set, chains will be processed in original order,
-                            which for bi-/tetramolecular means that they will likely
-                            be misclassified; use with care!
-
+                            a perfect tetrad stacking covers 4 nucleotides;
+                            this option can be used with value 1 or 2 to
+                            allow this number of nucleotides to be non-
+                            stacked with otherwise well aligned tetrad
+                            [default=2]
+      --strict              nucleotides in tetrad are found when linked only
+                            by cWH pairing
+      --no-reorder          chains of bi- and tetramolecular quadruplexes
+                            should be reordered to be able to have them
+                            classified; when this is set, chains will be
+                            processed in original order, which for
+                            bi-/tetramolecular means that they will likely be
+                            misclassified; use with care!
 
 
 # Examples
