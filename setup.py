@@ -29,6 +29,6 @@ setup(name = "linktetrado",
       ],
       entry_points = {'console_scripts': ['linktetrado=linktetrado.main:main']},
       install_requires = [
-          'numpy', 'rnapolis', 'orjson', 'eltetrado'
+          'numpy==1.26.4', 'rnapolis==0.8.0', 'orjson==3.10.7', 'eltetrado==1.6.0'
       ]
 )
