@@ -542,12 +542,9 @@ def ntads(analysis, params):
         if len(add_order) == 3:
             if max(add_order[0].score(), add_order[1].score()) < add_order[2].score():
                 add_order.remove(add_order[2])
-        #for add in add_order:
-        #    print(add.score())
         valid_tetrad_candidates[tetrad] = add_order
 
     multimers = []
-    print(params.lax_order)
     if not params.lax_order:
         # Now we have made multimers from available candidates.
         # Step 2 - Shrink down all multimers to match numbers and positions.
