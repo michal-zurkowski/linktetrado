@@ -31,17 +31,9 @@ thymine, and red for adenine. Green thus highlights the guanine tetrad core.
 
 # Installation
 
-Please download repository and run:
-
-    python -m pip install .
-
-<!-- TODO prepare proper pip install package
-
 Please run:
 
     pip install linktetrado
-
--->
 
 # Dependencies
 
